@@ -11,6 +11,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\BoolField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\DateField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\FkField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\ApiAware;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\CascadeDelete;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\PrimaryKey;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\Required;
@@ -49,22 +50,22 @@ class BlogEntriesDefinition extends EntityDefinition
     protected function defineFields(): FieldCollection
     {
         return new FieldCollection([
-            (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
-            new BoolField('active', 'active'),
-            new BoolField('detail_teaser_image', 'detailTeaserImage'),
+            (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey(), new ApiAware()),
+            (new BoolField('active', 'active'))->addFlags(new ApiAware()),
+            (new BoolField('detail_teaser_image', 'detailTeaserImage'))->addFlags(new ApiAware()),
 
             (new FkField('media_id', 'mediaId', MediaDefinition::class)),
             (new FkField('author_id', 'authorId', BlogAuthorDefinition::class))->addFlags(new Required()),
             (new OneToOneAssociationField('media', 'media_id', 'id', MediaDefinition::class, true)),
-
-            new TranslatedField('title'),
-            new TranslatedField('slug'),
-            new TranslatedField('teaser'),
-            new TranslatedField('metaTitle'),
-            new TranslatedField('metaDescription'),
-            new TranslatedField('content'),
-
-            (new DateField('published_at', 'publishedAt'))->addFlags(new Required()),
+    
+            (new TranslatedField('title'))->addFlags(new ApiAware()),
+            (new TranslatedField('slug'))->addFlags(new ApiAware()),
+            (new TranslatedField('teaser'))->addFlags(new ApiAware()),
+            (new TranslatedField('metaTitle'))->addFlags(new ApiAware()),
+            (new TranslatedField('metaDescription'))->addFlags(new ApiAware()),
+            (new TranslatedField('content'))->addFlags(new ApiAware()),
+    
+            (new DateField('published_at', 'publishedAt'))->addFlags(new Required(), new ApiAware()),
 
             (new TranslationsAssociationField(BlogTranslationDefinition::class, 'sas_blog_entries_id'))->addFlags(new Required()),
 
