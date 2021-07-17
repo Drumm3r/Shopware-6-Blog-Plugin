@@ -64,6 +64,7 @@ class BlogEntriesDefinition extends EntityDefinition
             (new TranslatedField('metaTitle'))->addFlags(new ApiAware()),
             (new TranslatedField('metaDescription'))->addFlags(new ApiAware()),
             (new TranslatedField('content'))->addFlags(new ApiAware()),
+            (new TranslatedField('customFields'))->addFlags(new ApiAware()),
 
             (new DateField('published_at', 'publishedAt'))->addFlags(new Required(), new ApiAware()),
 
