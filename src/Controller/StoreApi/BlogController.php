@@ -64,44 +64,4 @@ class BlogController extends AbstractBlogController
 
         return new BlogControllerResponse($this->blogRepository->search($criteria, $context->getContext()));
     }
-
-    /**
-     * @Entity("sas_blog_entries")
-     * @OA\Get(
-     *      path="/blog/{articleId}",
-     *      summary="This route can be used to load one entry of sas_blog_entries",
-     *      operationId="readExample",
-     *      tags={"Store API", "Example"},
-     *      @OA\Parameter(name="Api-Basic-Parameters"),
-     *      @OA\Response(
-     *          response="200",
-     *          description="",
-     *          @OA\JsonContent(type="object",
-     *              @OA\Property(
-     *                  property="total",
-     *                  type="integer",
-     *                  description="Total amount"
-     *              ),
-     *              @OA\Property(
-     *                  property="aggregations",
-     *                  type="object",
-     *                  description="aggregation result"
-     *              ),
-     *              @OA\Property(
-     *                  property="elements",
-     *                  type="array",
-     *                  @OA\Items(ref="#/components/schemas/swag_example_flat")
-     *              )
-     *          )
-     *     )
-     * )
-     * @Route("/store-api/blog/{articleId}", name="store-api.sas.blog.detail", methods={"GET"})
-     */
-    public function detail(string $articleId, Criteria $criteria, SalesChannelContext $context): BlogControllerResponse
-    {
-        $criteria->setIds([$articleId]);
-        $criteria->addAssociations(['author.salutation', 'blogCategories']);
-
-        return new BlogControllerResponse($this->blogRepository->search($criteria, $context->getContext()));
-    }
 }
