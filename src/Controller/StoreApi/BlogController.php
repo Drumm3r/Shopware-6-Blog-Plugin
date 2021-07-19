@@ -5,6 +5,7 @@ namespace Sas\BlogModule\Controller\StoreApi;
 use OpenApi\Annotations as OA;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\Framework\Routing\Annotation\Entity;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -13,10 +14,16 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * @RouteScope(scopes={"store-api"})
  */
-class BlogController
+class BlogController extends AbstractBlogController
 {
     public function __construct(protected EntityRepositoryInterface $blogRepository)
     {
+    }
+
+
+    public function getDecorated(): AbstractBlogController
+    {
+        throw new DecorationPatternException(self::class);
     }
 
     /**
@@ -49,9 +56,9 @@ class BlogController
      *          )
      *     )
      * )
-     * @Route("/store-api/blog", name="store-api.sas.blog.list", methods={"GET"})
+     * @Route("/store-api/blog", name="store-api.sas.blog.load", methods={"GET"})
      */
-    public function list(Criteria $criteria, SalesChannelContext $context): BlogControllerResponse
+    public function load(Criteria $criteria, SalesChannelContext $context): BlogControllerResponse
     {
         $criteria->addAssociations(['author.salutation', 'blogCategories']);
 
