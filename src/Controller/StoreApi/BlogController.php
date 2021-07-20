@@ -32,7 +32,7 @@ class BlogController extends AbstractBlogController
     /**
      * @Entity("sas_blog_entries")
      * @OA\Get(
-     *      path="/blog",
+     *      path="/store-api/blog",
      *      summary="This route can be used to load the sas_blog_entries by specific filters",
      *      operationId="listBlog",
      *      tags={"Store API", "Blog"},
@@ -59,7 +59,7 @@ class BlogController extends AbstractBlogController
      *          )
      *     )
      * )
-     * @Route("/store-api/blog", name="store-api.sas.blog.load", methods={"GET"})
+     * @Route("/store-api/blog", name="store-api.sas.blog.load", methods={"GET","POST"})
      */
     public function load(Request $request, Criteria $criteria, SalesChannelContext $context): BlogControllerResponse
     {
