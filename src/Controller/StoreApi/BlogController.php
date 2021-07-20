@@ -5,11 +5,15 @@ namespace Sas\BlogModule\Controller\StoreApi;
 use OpenApi\Annotations as OA;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\Framework\Routing\Annotation\Entity;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
+use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @RouteScope(scopes={"store-api"})
@@ -50,57 +54,33 @@ class BlogController extends AbstractBlogController
      *              @OA\Property(
      *                  property="elements",
      *                  type="array",
-     *                  @OA\Items(ref="#/components/schemas/swag_example_flat")
+     *                  @OA\Items(ref="#/components/schemas/blog_entities_flat")
      *              )
      *          )
      *     )
      * )
      * @Route("/store-api/blog", name="store-api.sas.blog.load", methods={"GET"})
      */
-    public function load(Criteria $criteria, SalesChannelContext $context): BlogControllerResponse
+    public function load(Request $request, Criteria $criteria, SalesChannelContext $context): BlogControllerResponse
     {
-        $criteria->addAssociations(['author.salutation', 'blogCategories']);
+        $criteria = $this->buildCriteria($request, $criteria);
 
         return new BlogControllerResponse($this->blogRepository->search($criteria, $context->getContext()));
     }
 
-    /**
-     * @Entity("sas_blog_entries")
-     * @OA\Get(
-     *      path="/blog/{articleId}",
-     *      summary="This route can be used to load one entry of sas_blog_entries",
-     *      operationId="readExample",
-     *      tags={"Store API", "Example"},
-     *      @OA\Parameter(name="Api-Basic-Parameters"),
-     *      @OA\Response(
-     *          response="200",
-     *          description="",
-     *          @OA\JsonContent(type="object",
-     *              @OA\Property(
-     *                  property="total",
-     *                  type="integer",
-     *                  description="Total amount"
-     *              ),
-     *              @OA\Property(
-     *                  property="aggregations",
-     *                  type="object",
-     *                  description="aggregation result"
-     *              ),
-     *              @OA\Property(
-     *                  property="elements",
-     *                  type="array",
-     *                  @OA\Items(ref="#/components/schemas/swag_example_flat")
-     *              )
-     *          )
-     *     )
-     * )
-     * @Route("/store-api/blog/{articleId}", name="store-api.sas.blog.detail", methods={"GET"})
-     */
-    public function detail(string $articleId, Criteria $criteria, SalesChannelContext $context): BlogControllerResponse
+    protected function buildCriteria(Request $request, Criteria $criteria): Criteria
     {
-        $criteria->setIds([$articleId]);
+        $search = $request->get('search');
+        if ($search) {
+            if (Uuid::isValid($search)) {
+                $criteria->setIds([$search]);
+            } else {
+                $criteria->addFilter(new EqualsFilter('slug', $search));
+            }
+        }
+
         $criteria->addAssociations(['author.salutation', 'blogCategories']);
 
-        return new BlogControllerResponse($this->blogRepository->search($criteria, $context->getContext()));
+        return $criteria;
     }
 }
